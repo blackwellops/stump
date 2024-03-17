@@ -2,7 +2,7 @@
 # Frontend Build Stage
 # ------------------------------------------------------------------------------
 
-FROM node:20.0.0-alpine3.16 as frontend
+FROM node:20.11.1-alpine3.18 as frontend
 ARG TARGETARCH
 
 WORKDIR /app
@@ -17,7 +17,7 @@ RUN yarn install; \
 # Cargo Build Stage
 # ------------------------------------------------------------------------------
 
-FROM rust:1.72.1-slim-buster AS builder
+FROM rust:latest AS builder
 
 ARG GIT_REV
 ENV GIT_REV=${GIT_REV}
@@ -28,14 +28,35 @@ ENV TAGS=${TAGS}
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
     build-essential \
     cmake \
     git \
+    wget \
+    npm \
     libssl-dev \
     pkg-config \
     libsqlite3-dev;
 
 COPY . .
+
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
+RUN apt-get update && apt-get install nodejs -y
+
+RUN npm install --global yarn
+
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
+
+RUN /root/.local/share/pnpm/pnpm run setup
+
+RUN /root/.local/share/pnpm/pnpm web build
+
+RUN cargo codegen
 
 RUN ./scripts/release/utils.sh -w; \
     set -ex; \
