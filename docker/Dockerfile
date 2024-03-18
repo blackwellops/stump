@@ -51,11 +51,9 @@ RUN apt-get update && apt-get install nodejs -y
 RUN npm install --global yarn
 RUN npm install --global pnpm
 
-#RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
+RUN pnpm run setup
 
-RUN /root/.local/share/pnpm/pnpm run setup
-
-RUN /root/.local/share/pnpm/pnpm web build
+RUN pnpm web build
 
 RUN cargo codegen
 
