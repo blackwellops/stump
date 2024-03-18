@@ -15,7 +15,7 @@ export const stumpDark: EpubTheme = {
 	h3: { color: '#E8EDF4' },
 	h4: { color: '#E8EDF4' },
 	h5: { color: '#E8EDF4' },
-	p: { color: '#E8EDF4 !important', 'font-size': 'unset' },
+	p: { color: '#E8EDF4 !important', 'font-size': 'unset', 'font-family': 'san-serif !important' },
 	span: { color: '#E8EDF4' },
 	ul: { color: '#E8EDF4' },
 }
